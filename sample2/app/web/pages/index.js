@@ -118,7 +118,7 @@ export default function Home() {
         type="text"
         size="28"
         required
-        onChange={(e) => setOwnerWalletAddress(e.target.value.toLowerCase())}
+        onChange={(e) => setDbName(e.target.value.toLowerCase())}
       />
       <br />
       <br />
@@ -127,7 +127,7 @@ export default function Home() {
         type="text"
         size="28"
         required
-        onChange={(e) => setDbName(e.target.value)}
+        onChange={(e) => setOwnerWalletAddress(e.target.value)}
       />
       <br />
       <br />
