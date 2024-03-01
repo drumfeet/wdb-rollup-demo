@@ -13,9 +13,6 @@ const main = async () => {
     {
       op: "deploy_contract",
       key: db_name,
-      db: {
-        owner: accounts.evm.user.address.toLowerCase(),
-      },
     },
     {
       privateKey: adminAuth, // Replace 'ADMIN_PRIVATE_KEY' with the actual admin private key
