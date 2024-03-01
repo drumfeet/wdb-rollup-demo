@@ -1,28 +1,37 @@
 const WeaveDB = require("weavedb-node-client")
 const accounts = require("./lib/accounts")
+
+const db_name = "mar8"
 const db = new WeaveDB({
   rpc: "localhost:8080",
-  contractTxId: "drumfeetkey1", // Replace 'CONTRACT_TX_ID' with an existing deployed database contract on the rollup node
+  contractTxId: db_name,
 })
+console.log("db: ", db)
+console.log(`db: ${db}`)
 
 const main = async () => {
   const adminAuth = accounts.evm.admin.privateKey
-  const tx = await db.admin(
-    {
-      op: "add_db",
-      key: "drumfeettest2", // Replace 'NEW_CONTRACT_TX_ID' with your actual database contract name
-      db: {
-        app: "http://localhost:3000",
-        name: "drumfeettest2", // Replace 'db_name' with your actual database instance
-        rollup: true, // Set this to true to deploy your database to roll up to the Layer 1 Warp contract
-        plugins: { notifications: {} },
-        tick: 1000 * 60 * 5,
+
+  try {
+    await db.admin(
+      {
+        op: "add_db",
+        key: db_name, // This value will appear as `Contract TxID` in WeaveDB Scan if `rollup` to Warp is set to false
+        db: {
+          app: "http://localhost:3000",
+          name: db_name, // Replace 'db_name' with the database name you wish to use
+          rollup: true, // Set this to true to deploy your database to roll up to the Layer 1 Warp contract
+          plugins: { notifications: {} },
+          tick: 1000 * 60 * 5,
+          owner: accounts.evm.user.address.toLowerCase(),
+        },
       },
-    },
-    {
-      privateKey: adminAuth, // Replace 'ADMIN_PRIVATE_KEY' with the actual admin private key
-    }
-  )
+      { privateKey: adminAuth, nonce: 1 }
+    )
+    console.log(`DB [${db_name}] added!`)
+  } catch (e) {
+    console.log(e.message)
+  }
 }
 
 main()
