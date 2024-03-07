@@ -46,6 +46,7 @@ export default function Home() {
   const [db, setDb] = useState()
   const [dbName, setDbName] = useState("")
   const [ownerWalletAddress, setOwnerWalletAddress] = useState("")
+  const ADMIN_PRIVATE_KEY = "" // Replace 'ADMIN_PRIVATE_KEY' with the actual admin private key
 
   const deployDatabase = async () => {
     try {
@@ -63,7 +64,7 @@ export default function Home() {
           },
         },
         {
-          // privateKey: adminWallet,
+          // privateKey: ADMIN_PRIVATE_KEY,
           nonce: 1,
         }
       )
@@ -79,12 +80,9 @@ export default function Home() {
         {
           op: "deploy_contract",
           key: dbName,
-          db: {
-            owner: ownerWalletAddress,
-          },
         }
         // {
-        //   privateKey: adminAuth, // Replace 'ADMIN_PRIVATE_KEY' with the actual admin private key
+        //   privateKey: ADMIN_PRIVATE_KEY,
         // }
       )
       if (contractTxId) {

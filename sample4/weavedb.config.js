@@ -11,7 +11,7 @@ module.exports = {
     localhost: { url: "localhost:8080", admin: "admin" },
     offchain: {
       // url: "13.250.6.80:9090",
-      url: "13.250.6.80:8080",
+      url: "13.229.238.124:8080",
       admin: "admin",
     },
   },
