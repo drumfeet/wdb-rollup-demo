@@ -1,7 +1,7 @@
 module.exports = {
   db: {
     app: "http://localhost:3000",
-    name: "drumtest5",
+    name: "drumtest7",
     rollup: true,
     plugins: {},
   },

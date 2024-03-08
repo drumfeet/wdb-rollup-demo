@@ -4,7 +4,7 @@ module.exports = {
     required: ["id", "body", "owner", "date"],
     properties: {
       id: { type: "string" },
-      description: { type: "string" },
+      body: { type: "string" },
       owner: { type: "string" },
       date: { type: "number" },
     },
