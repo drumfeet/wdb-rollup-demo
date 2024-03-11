@@ -3,7 +3,7 @@ const SDK = require("weavedb-node-client")
 const accounts = require("./lib/accounts")
 const { nanoid } = require("nanoid")
 
-const ADD_TX_COUNT = 20
+const ADD_TX_COUNT = 5
 const GET_TX_COUNT = 1
 const COLLECTION_NAME = "posts"
 const userAuth = { privateKey: accounts.evm.user.privateKey }
@@ -17,7 +17,7 @@ const performanceObserver = new PerformanceObserver((items) => {
   items.getEntries().forEach((entry) => {
     console.log(entry)
     if (entry.name === "measureAddPerformance") {
-      console.log(`TPS: ${COUNT / (entry.duration / 1000)}`)
+      console.log(`TPS: ${ADD_TX_COUNT / (entry.duration / 1000)}`)
     }
   })
 
