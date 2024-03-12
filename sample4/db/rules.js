@@ -62,11 +62,7 @@ module.exports = {
     ],
     [
       "delete:post", // define a custom query for deletion
-      [
-        // "=$" will assign the result of the following FPJSON to a variable
-        ["=$isOwner", ["equals", "$signer", "$old.owner"]], // check if signer is data owner
-        ["allowifall()", ["$isOwner"]], // allow the query if $isOwner is true
-      ],
+      [["allow()"]],
     ],
   ],
 }
