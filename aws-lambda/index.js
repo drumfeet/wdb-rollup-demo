@@ -38,7 +38,6 @@ export const handler = async (event) => {
 
       const start = performance.now()
       randomBytesArray.map((_str) => {
-        console.log("_str", _str)
         promises.push(add(_str))
       })
       const end = performance.now()
