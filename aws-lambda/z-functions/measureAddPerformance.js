@@ -17,12 +17,11 @@ export const handler = async (event) => {
   const measureAddPerformance = async (count) => {
     const start = performance.now()
     for (let i = 0; i < count; i++) {
-      const uuid = crypto.randomUUID()
+      const randomBytes = crypto.randomBytes(16).toString("hex")
       try {
-        let i = 0
         const tx = await db.query(
           "add:post",
-          { body: `Post ${uuid}` },
+          { body: `Post ${randomBytes}` },
           COLLECTION_NAME,
           userAuth
         )
