@@ -2,6 +2,7 @@ import { performance } from "perf_hooks"
 import SDK from "weavedb-node-client"
 import crypto from "crypto"
 import userAuth from "./.wallets/user.json" assert { type: "json" }
+import PrivateKeys from "./.wallets/privateKeys.js"
 
 export const handler = async (event) => {
   const TX_COUNT = 20
@@ -10,42 +11,44 @@ export const handler = async (event) => {
   const db = new SDK({
     rpc: "47.128.255.11:8080",
     contractTxId: "drumtest1",
+    // rpc: "localhost:8080",
+    // contractTxId: "K6zxVKEuOeeZGhvfcE1q9SVxH7lkOJ4eqGuN9UWL-ZA",
+    // contractTxId: "dLQzTjEWblJBYWb2nAwX_9ZFJAbYiZFYqZ_pxxzcGww",
   })
 
   const _myEntries = []
 
-  const add = async (str) => {
+  const add = async (_key) => {
+    const randomBytes = crypto.randomBytes(16).toString("hex")
     const tx = await db.query(
       "add:post",
-      { body: `Post ${str}` },
+      { body: `Post ${randomBytes}` },
       COLLECTION_NAME,
-      userAuth
+      { privateKey: _key }
     )
 
     if (tx.error) {
       throw tx.error
     }
 
-    return tx
+    return tx.docID
   }
 
   const measureAddPerformance = async (count) => {
     try {
-      const randomBytesArray = Array.from({ length: count }, () =>
-        crypto.randomBytes(16).toString("hex")
-      )
       const promises = []
 
       const start = performance.now()
-      randomBytesArray.map((_str) => {
-        promises.push(add(_str))
+      PrivateKeys().map(async (_key) => {
+        promises.push(add(_key))
       })
+
       const end = performance.now()
       const duration = end - start
       _myEntries.push(
-        `name: measureAddPerformance, count: ${count}, duration: ${duration} ms, average TPS: ${
-          count / (duration / 1000)
-        }`
+        `name: measureAddPerformance, count: ${
+          promises.length
+        }, duration: ${duration} ms, average TPS: ${count / (duration / 1000)}`
       )
 
       const results = await Promise.allSettled(promises)
@@ -60,6 +63,7 @@ export const handler = async (event) => {
     statusCode: 200,
     body: JSON.stringify(_myEntries),
   }
+  console.log("response", response)
   return response
 }
 
