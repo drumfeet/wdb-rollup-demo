@@ -15,22 +15,18 @@ export const handler = async (event) => {
   const _myEntries = []
 
   const add = async (str) => {
-    try {
-      const tx = await db.query(
-        "add:post",
-        { body: `Post ${str}` },
-        COLLECTION_NAME,
-        userAuth
-      )
+    const tx = await db.query(
+      "add:post",
+      { body: `Post ${str}` },
+      COLLECTION_NAME,
+      userAuth
+    )
 
-      if (tx.error) {
-        throw new Error(tx.error)
-      }
-
-      return tx
-    } catch (e) {
-      console.error(e.message)
+    if (tx.error) {
+      throw tx.error
     }
+
+    return tx
   }
 
   const measureAddPerformance = async (count) => {
@@ -42,6 +38,7 @@ export const handler = async (event) => {
 
       const start = performance.now()
       randomBytesArray.map((_str) => {
+        console.log("_str", _str)
         promises.push(add(_str))
       })
       const end = performance.now()
@@ -55,7 +52,7 @@ export const handler = async (event) => {
       const results = await Promise.allSettled(promises)
       console.log("results", results)
     } catch (e) {
-      console.error(e.message)
+      console.error("sdfsd", e.message)
     }
   }
   await measureAddPerformance(TX_COUNT)
