@@ -51,7 +51,7 @@ export const handler = async (event) => {
       const results = await Promise.allSettled(promises)
       console.log("results", results)
     } catch (e) {
-      console.error("sdfsd", e.message)
+      console.error(e.message)
     }
   }
   await measureAddPerformance(TX_COUNT)
