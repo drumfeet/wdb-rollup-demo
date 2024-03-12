@@ -1,11 +1,10 @@
 import { performance } from "perf_hooks"
 import SDK from "weavedb-node-client"
-import { nanoid } from "nanoid"
+import crypto from "crypto"
 import userAuth from "./.wallets/user.json" assert { type: "json" }
 
 export const handler = async (event) => {
-  const ADD_TX_COUNT = 20
-  const GET_TX_COUNT = 1
+  const TX_COUNT = 20
   const COLLECTION_NAME = "posts"
 
   const db = new SDK({
@@ -15,53 +14,51 @@ export const handler = async (event) => {
 
   const _myEntries = []
 
+  const add = async (str) => {
+    try {
+      const tx = await db.query(
+        "add:post",
+        { body: `Post ${str}` },
+        COLLECTION_NAME,
+        userAuth
+      )
+
+      if (tx.error) {
+        throw new Error(tx.error)
+      }
+
+      return tx
+    } catch (e) {
+      console.error(e.message)
+    }
+  }
+
   const measureAddPerformance = async (count) => {
-    const start = performance.now()
-    for (let i = 0; i < count; i++) {
-      const randomStr = nanoid(8)
-      try {
-        let i = 0
-        const tx = await db.query(
-          "add:post",
-          { body: `Post ${randomStr}` },
-          COLLECTION_NAME,
-          userAuth
-        )
-      } catch (e) {
-        console.error(e.message)
-      }
+    try {
+      const randomBytesArray = Array.from({ length: count }, () =>
+        crypto.randomBytes(16).toString("hex")
+      )
+      const promises = []
+
+      const start = performance.now()
+      randomBytesArray.map((_str) => {
+        promises.push(add(_str))
+      })
+      const end = performance.now()
+      const duration = end - start
+      _myEntries.push(
+        `name: measureAddPerformance, count: ${count}, duration: ${duration} ms, average TPS: ${
+          count / (duration / 1000)
+        }`
+      )
+
+      const results = await Promise.allSettled(promises)
+      console.log("results", results)
+    } catch (e) {
+      console.error(e.message)
     }
-    const end = performance.now()
-    const duration = end - start
-
-    _myEntries.push(
-      `name: measureAddPerformance, count: ${count}, duration: ${duration}, average TPS: ${
-        count / (duration / 1000)
-      }`
-    )
   }
-
-  const measureGetPerformance = async (count) => {
-    const start = performance.now()
-    for (let i = 0; i < count; i++) {
-      try {
-        const result = await db.get(COLLECTION_NAME)
-      } catch (e) {
-        console.error(e.message)
-      }
-    }
-    const end = performance.now()
-    const duration = end - start
-
-    _myEntries.push(
-      `name: measureGetPerformance, count: ${count}, duration: ${duration}, average TPS: ${
-        count / (duration / 1000)
-      }`
-    )
-  }
-
-  await measureAddPerformance(ADD_TX_COUNT)
-  await measureGetPerformance(GET_TX_COUNT)
+  await measureAddPerformance(TX_COUNT)
 
   const response = {
     statusCode: 200,
@@ -69,3 +66,5 @@ export const handler = async (event) => {
   }
   return response
 }
+
+handler()
