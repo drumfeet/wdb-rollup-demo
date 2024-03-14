@@ -34,7 +34,6 @@ const main = () => {
   const measureAddPerformance = async () => {
     try {
       const promises = []
-
       PrivateKeys().map(async (_key) => {
         promises.push(addDocument(_key))
       })

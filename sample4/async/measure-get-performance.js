@@ -1,4 +1,4 @@
-const { performance, PerformanceObserver } = require("perf_hooks")
+const { performance } = require("perf_hooks")
 const SDK = require("weavedb-node-client")
 
 const TX_COUNT = parseInt(process.argv[2], 10) || 1
@@ -11,20 +11,13 @@ const db = new SDK({
   contractTxId: CONTRACT_TX_ID,
 })
 
-const performanceObserver = new PerformanceObserver((items) => {
-  items.getEntries().forEach((entry) => {
-    console.log(entry)
-    console.log(`TPS: ${TX_COUNT / (entry.duration / 1000)}`)
-  })
-})
-performanceObserver.observe({
-  entryTypes: ["function"],
-  buffer: false,
-})
-
 const getDocuments = async () => {
+  const start = performance.now()
   const result = await db.get(COLLECTION_NAME)
-  return result.length
+  const end = performance.now()
+  const duration = end - start
+  console.log("result.length", result.length)
+  return duration
 }
 
 const measureGetPerformance = async (count) => {
@@ -36,8 +29,13 @@ const measureGetPerformance = async (count) => {
 
     const results = await Promise.allSettled(promises)
     console.log("results", results)
+
+    const totalDuration = results.reduce((acc, curr) => acc + curr.value, 0)
+    const averageLatency = totalDuration / count
+    console.log(`Average latency: ${averageLatency} milliseconds.`)
+    console.log(`TPS ${count / (totalDuration / 1000)}`)
   } catch (e) {
     console.error(e.message)
   }
 }
-performance.timerify(measureGetPerformance)(TX_COUNT)
+measureGetPerformance(TX_COUNT)
