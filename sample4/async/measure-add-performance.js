@@ -7,53 +7,50 @@ const COLLECTION_NAME = process.argv[2] || "posts"
 const CONTRACT_TX_ID = process.argv[3] || "drumtest1"
 const RPC_NODE = process.argv[4] || "13.212.91.15:8080"
 
-const db = new SDK({
-  rpc: RPC_NODE,
-  contractTxId: CONTRACT_TX_ID,
-})
-
-const performanceObserver = new PerformanceObserver((items) => {
-  const count = PrivateKeys().length
-  console.log("Wallet count", count)
-  items.getEntries().forEach((entry) => {
-    console.log(entry)
-
-    console.log(`TPS: ${count / (entry.duration / 1000)}`)
+const main = () => {
+  const db = new SDK({
+    rpc: RPC_NODE,
+    contractTxId: CONTRACT_TX_ID,
   })
-})
-performanceObserver.observe({
-  entryTypes: ["function"],
-  buffer: false,
-})
 
-const addDocument = async (_key) => {
-  const randomBytes = crypto.randomBytes(16).toString("hex")
-  const tx = await db.query(
-    "add:post",
-    { body: `Post ${randomBytes}` },
-    COLLECTION_NAME,
-    { privateKey: _key }
-  )
+  const addDocument = async (_key) => {
+    const randomBytes = crypto.randomBytes(16).toString("hex")
+    const start = performance.now()
+    const tx = await db.query(
+      "add:post",
+      { body: `Post ${randomBytes}` },
+      COLLECTION_NAME,
+      { privateKey: _key }
+    )
+    const end = performance.now()
 
-  if (tx.error) {
-    throw tx.error
+    if (tx.error) {
+      throw tx.error
+    }
+
+    return end - start
   }
 
-  return tx.docID
-}
+  const measureAddPerformance = async () => {
+    try {
+      const promises = []
 
-const measureAddPerformance = async () => {
-  try {
-    const promises = []
+      PrivateKeys().map(async (_key) => {
+        promises.push(addDocument(_key))
+      })
 
-    PrivateKeys().map(async (_key) => {
-      promises.push(addDocument(_key))
-    })
+      const results = await Promise.allSettled(promises)
+      console.log("results", results)
 
-    const results = await Promise.allSettled(promises)
-    console.log("results", results)
-  } catch (e) {
-    console.error(e.message)
+      const totalDuration = results.reduce((acc, curr) => acc + curr.value, 0)
+      const count = PrivateKeys().length
+      const averageLatency = totalDuration / count
+      console.log(`Average latency: ${averageLatency} milliseconds.`)
+      console.log(`TPS ${count / (totalDuration / 1000)}`)
+    } catch (e) {
+      console.error(e.message)
+    }
   }
+  measureAddPerformance()
 }
-performance.timerify(measureAddPerformance)()
+main()
