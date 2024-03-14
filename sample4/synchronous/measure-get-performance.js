@@ -3,7 +3,7 @@ const SDK = require("weavedb-node-client")
 
 const COLLECTION_NAME = process.argv[2] || "posts"
 const CONTRACT_TX_ID = process.argv[3] || "drumtest1"
-const RPC_NODE = process.argv[4] || "localhost:8080"
+const RPC_NODE = process.argv[4] || "13.212.91.15:8080"
 
 const db = new SDK({
   rpc: RPC_NODE,
