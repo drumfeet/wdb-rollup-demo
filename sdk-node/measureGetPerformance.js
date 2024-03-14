@@ -24,7 +24,7 @@ const main = async () => {
   const measureGetPerformance = async () => {
     try {
       const result = await db.get(COLLECTION_NAME)
-      console.log("result.length", result.length)
+      console.log("Number of documents", result.length)
     } catch (e) {
       console.error(e.message)
     }

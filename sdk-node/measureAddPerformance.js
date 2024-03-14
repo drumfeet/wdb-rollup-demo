@@ -4,7 +4,7 @@ const SDK = require("weavedb-sdk-node")
 const userAuth = process.argv[5] || require("./.wallets/user.json")
 
 const main = async () => {
-  const ADD_TX_COUNT = parseInt(process.argv[2], 10) || 1
+  const TX_COUNT = parseInt(process.argv[2], 10) || 1
   const COLLECTION_NAME = process.argv[3] || "users"
   const CONTRACT_TX_ID =
     process.argv[4] || "I5eMduWzfjAZvqJNtQ8j8gtD7Vh6W-nxO_Y9cWTUKuU"
@@ -18,7 +18,7 @@ const main = async () => {
     items.getEntries().forEach((entry) => {
       console.log(entry)
       if (entry.name === "measureAddPerformance") {
-        console.log(`TPS: ${ADD_TX_COUNT / (entry.duration / 1000)}`)
+        console.log(`TPS: ${TX_COUNT / (entry.duration / 1000)}`)
       }
     })
   })
@@ -44,7 +44,7 @@ const main = async () => {
     }
   }
 
-  performance.timerify(measureAddPerformance)(ADD_TX_COUNT)
+  performance.timerify(measureAddPerformance)(TX_COUNT)
 }
 
 main()
