@@ -25,7 +25,7 @@ performanceObserver.observe({
 })
 
 const measureDeletePerformance = async (count) => {
-  const docs = await db.cget(COLLECTION_NAME, count)
+  const docs = await db.cget(COLLECTION_NAME, ["date", "desc"], count)
 
   for (let i = 0; i < count; i++) {
     try {
