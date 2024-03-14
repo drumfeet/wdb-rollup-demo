@@ -20,9 +20,9 @@ performanceObserver.observe({
   buffer: false,
 })
 
-const measureGetPerformance = async (count) => {
+const measureGetPerformance = async () => {
   try {
-    const result = await db.get(COLLECTION_NAME)
+    const result = await db.get(COLLECTION_NAME, ["date", "desc"])
     console.log("Number of documents", result.length)
   } catch (e) {
     console.error(e.message)
