@@ -1,6 +1,5 @@
 const { performance, PerformanceObserver } = require("perf_hooks")
 const SDK = require("weavedb-node-client")
-const crypto = require("crypto")
 
 const TX_COUNT = parseInt(process.argv[2], 10) || 1
 const COLLECTION_NAME = process.argv[3] || "posts"
@@ -17,9 +16,7 @@ const db = new SDK({
 const performanceObserver = new PerformanceObserver((items) => {
   items.getEntries().forEach((entry) => {
     console.log(entry)
-    if (entry.name === "measureAddPerformance") {
-      console.log(`TPS: ${TX_COUNT / (entry.duration / 1000)}`)
-    }
+    console.log(`TPS: ${TX_COUNT / (entry.duration / 1000)}`)
   })
 })
 performanceObserver.observe({
@@ -27,14 +24,16 @@ performanceObserver.observe({
   buffer: false,
 })
 
-const measureAddPerformance = async (count) => {
+const measureDeletePerformance = async (count) => {
+  const docs = await db.cget(COLLECTION_NAME, count)
+
   for (let i = 0; i < count; i++) {
-    const randomBytes = crypto.randomBytes(16).toString("hex")
     try {
+      const doc = docs[i]
       const tx = await db.query(
-        "add:post",
-        { body: `Post ${randomBytes}` },
+        "delete:post",
         COLLECTION_NAME,
+        doc.id,
         userAuth
       )
       console.log("tx.docID", tx.docID)
@@ -43,4 +42,4 @@ const measureAddPerformance = async (count) => {
     }
   }
 }
-performance.timerify(measureAddPerformance)(TX_COUNT)
+performance.timerify(measureDeletePerformance)(TX_COUNT)

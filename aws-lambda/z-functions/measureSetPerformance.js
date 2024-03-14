@@ -20,7 +20,6 @@ export const handler = async (event) => {
       const randomBytes = crypto.randomBytes(16).toString("hex")
       const docID = randomBytes
       try {
-        let i = 0
         const tx = await db.query(
           "set:post",
           { body: `Post ${randomBytes}` },

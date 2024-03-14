@@ -34,7 +34,6 @@ const measureAddPerformance = async (count) => {
   for (let i = 0; i < count; i++) {
     const randomStr = nanoid(8)
     try {
-      let i = 0
       const tx = await db.query(
         "add:post",
         { body: `Post ${randomStr}` },
