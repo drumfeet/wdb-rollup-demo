@@ -5,7 +5,7 @@ import userAuth from "./.wallets/user.json" assert { type: "json" }
 import PrivateKeys from "./.wallets/privateKeys.js"
 
 export const handler = async (event) => {
-  const TX_COUNT = 20
+  const TX_COUNT = parseInt(process.argv[2], 10) || 20
   const COLLECTION_NAME = "posts"
 
   const db = new SDK({
