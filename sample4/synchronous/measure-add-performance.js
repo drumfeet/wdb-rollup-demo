@@ -1,12 +1,13 @@
 const { performance, PerformanceObserver } = require("perf_hooks")
 const SDK = require("weavedb-node-client")
+const crypto = require("crypto")
 
 const TX_COUNT = parseInt(process.argv[2], 10) || 1
 const COLLECTION_NAME = process.argv[3] || "posts"
 const CONTRACT_TX_ID = process.argv[4] || "drumtest1"
-const RPC_NODE = process.argv[5] || "localhost:8080"
+const RPC_NODE = process.argv[5] || "13.212.91.15:8080"
 const userAuth =
-  process.argv[6] || require("./../.weavedb/accounts/evm/user.json")
+  process.argv[6] || require("../.weavedb/accounts/evm/user.json")
 
 const db = new SDK({
   rpc: RPC_NODE,
