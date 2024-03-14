@@ -28,11 +28,13 @@ const main = async () => {
           userAuth
         )
         const end = performance.now()
-
         durations.push(end - start)
-        console.log(`${i+1} : tx.docID`, tx.docID)
+
+        if (tx.error) throw new Error(tx.error)
+
+        console.log(`${i + 1} : tx.docID`, tx.docID)
       } catch (e) {
-        console.error(e.message)
+        console.error(`${i + 1} :`, e.message)
       }
     }
     const totalDuration = durations.reduce((acc, curr) => acc + curr, 0)
