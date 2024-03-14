@@ -31,7 +31,7 @@ const main = async () => {
         const end = performance.now()
 
         durations.push(end - start)
-        console.log("tx.docID", tx.docID)
+        console.log(`${i+1} : tx.docID`, tx.docID)
       } catch (e) {
         console.error(e.message)
       }
