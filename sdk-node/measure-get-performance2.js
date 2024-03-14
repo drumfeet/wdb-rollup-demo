@@ -20,7 +20,7 @@ const main = async () => {
       const end = performance.now()
 
       durations.push(end - start)
-      console.log("Number of documents", result.length)
+      console.log(`${i} Documents fetched`, result.length)
     } catch (e) {
       console.error(e.message)
     }

@@ -19,7 +19,7 @@ const main = async () => {
         const start = performance.now()
         const result = await db.get(COLLECTION_NAME, ["date", "desc"])
         const end = performance.now()
-        console.log("Number of documents", result.length)
+        console.log(`${i} Documents fetched`, result.length)
 
         durations.push(end - start)
       } catch (e) {
