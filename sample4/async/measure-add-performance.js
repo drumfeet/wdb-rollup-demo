@@ -1,7 +1,7 @@
 const { performance, PerformanceObserver } = require("perf_hooks")
 const SDK = require("weavedb-node-client")
 const crypto = require("crypto")
-const PrivateKeys = require("../.weavedb/accounts/evm/privateKeys.js")
+const PrivateKeys = require("../.wallets/privateKeys.js")
 
 const COLLECTION_NAME = process.argv[2] || "posts"
 const CONTRACT_TX_ID = process.argv[3] || "drumtest1"
