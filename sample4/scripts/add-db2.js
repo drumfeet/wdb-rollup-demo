@@ -1,5 +1,5 @@
 const DB = require("weavedb-node-client")
-const accounts = require("./lib/accounts")
+const accounts = require("../../sample2/scripts/lib/accounts")
 const db = new DB({ rpc: "localhost:8080", contractTxId: "dbsample1" })
 
 const main = async () => {

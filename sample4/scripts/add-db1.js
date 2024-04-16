@@ -1,5 +1,5 @@
 const WeaveDB = require("weavedb-node-client")
-const accounts = require("./lib/accounts")
+const accounts = require("../../sample2/scripts/lib/accounts")
 
 const db_name = "mar8"
 const db = new WeaveDB({
