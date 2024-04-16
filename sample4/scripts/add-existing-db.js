@@ -4,7 +4,7 @@ const adminAuth = require("../.weavedb/accounts/evm/admin.json")
 
 const CONTRACT_TX_ID =
   process.argv[2] || "NA9rKscXy1byKA7oyVypcpLgokH8qYX7Mvbu4ei6g4U"
-const RPC_NODE = process.argv[3] || "localhost:8080"
+const RPC_NODE = process.argv[3] || "localhost:8080" //localhost:9090 does not work
 const DATABASE_KEY = CONTRACT_TX_ID
 
 const main = async () => {
@@ -31,6 +31,7 @@ const main = async () => {
           name: DATABASE_KEY,
           rollup: true,
           owner: dbInfo.owner,
+          contractTxId: CONTRACT_TX_ID,
         },
       },
       adminAuth
