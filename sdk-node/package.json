@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "weavedb-node-client": "^0.39.2",
     "weavedb-sdk-node": "^0.39.2"
   }
 }
