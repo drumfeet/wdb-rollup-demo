@@ -17,6 +17,7 @@
     "ethers": "^6.8.0",
     "mocha": "^10.2.0",
     "nanoid": "3",
+    "ramda": "^0.29.1",
     "weavedb-node-client": "^0.39.2",
     "weavedb-offchain": "^0.39.1",
     "weavedb-sdk-node": "^0.39.2"
