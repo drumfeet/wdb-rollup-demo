@@ -4,9 +4,9 @@ const adminAuth = require("../.weavedb/accounts/evm/owner.json")
 const TX_COUNT = parseInt(process.argv[2], 10) || 100000000
 const COLLECTION_NAME = process.argv[3] || "horseRace"
 
-const CONTRACT_TX_ID = "XSBw2sNJ8v8swclfesRQsOASGHDlyzp_9iFsbR60yoc"
+const CONTRACT_TX_ID = "mdsGnEPW-aah2R2CKJVBpwaMi79wyqMsM6UeYfV1C30"
 const RPC_NODE =
-  "c86eebdd-dcf6-4aee-b8cc-9a8f74177d03.raas.weavedb-node.xyz:443"
+  "ec9609ff-825a-459c-87a1-e59bed84bf7c.raas.weavedb-node.xyz:443"
 
 const wait = (ms) => {
   console.log("waiting for...", String(ms), "ms")
