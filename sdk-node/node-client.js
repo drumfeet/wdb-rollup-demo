@@ -54,5 +54,18 @@ const nodeClient = async () => {
   process.exit()
 }
 
+const getNodeStats = async () => {
+  try {
+    const db = new SDK({
+      rpc: RPC_NODE,
+    })
+    const stats = await db.node({ op: "stats" })
+    console.log("stats", stats)
+  } catch (e) {
+    console.log(e)
+  }
+}
+
 // sdkNode()
-nodeClient()
+// nodeClient()
+getNodeStats()
