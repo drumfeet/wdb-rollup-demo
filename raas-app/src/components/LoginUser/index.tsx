@@ -9,8 +9,8 @@ export function LoginUser() {
       <Flex
         bgGradient="linear(to-b, #0f0c29, #302b63, #24243e)"
         alignItems="center"
-        justifyContent="space-around"
-        height="100vh"
+        justifyContent="space-evenly"
+        minH="100vh"
       >
         <Box display={{ base: "none", lg: "block" }}>
           <Flex justifyContent="center" alignItems="center" minH="100%">

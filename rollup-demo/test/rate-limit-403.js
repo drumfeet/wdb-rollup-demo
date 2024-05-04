@@ -1,6 +1,8 @@
 const { expect } = require("chai")
 const SDK = require("weavedb-sdk-node")
 const EthCrypto = require("eth-crypto")
+const { resolve } = require("path")
+require("dotenv").config({ path: resolve(__dirname, "./.env") })
 
 describe("Rate Limit Error 403", function () {
   this.timeout(0)
@@ -22,6 +24,8 @@ describe("Rate Limit Error 403", function () {
       const db = new SDK({
         contractTxId: CONTRACT_TX_ID,
         nocache: true,
+        sequencerUrl: "https://gw.warp.cc/",
+        apiKey: process.env.apiKey,
       })
       await db.init()
 

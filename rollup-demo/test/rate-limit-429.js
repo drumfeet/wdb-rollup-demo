@@ -1,7 +1,8 @@
 const { expect } = require("chai")
 const SDK = require("weavedb-sdk-node")
 const fs = require("fs")
-const path = require("path")
+const { resolve } = require("path")
+require("dotenv").config({ path: resolve(__dirname, "./.env") })
 
 describe("Rate Limit Error 429", function () {
   this.timeout(0)
@@ -18,7 +19,7 @@ describe("Rate Limit Error 429", function () {
   })
 
   it("should not have a cache folder", () => {
-    const cachePath = path.resolve(__dirname, "../cache")
+    const cachePath = resolve(__dirname, "../cache")
     const folderExists = fs.existsSync(cachePath) // Check if the folder exists
     expect(folderExists).to.be.false // Assert that the folder does not exist
   })
@@ -27,6 +28,8 @@ describe("Rate Limit Error 429", function () {
     try {
       const db = new SDK({
         contractTxId: CONTRACT_TX_ID,
+        sequencerUrl: "https://gw.warp.cc/",
+        apiKey: process.env.apiKey,
       })
       await db.init()
       console.log(db)
