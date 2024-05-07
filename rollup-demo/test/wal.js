@@ -1,275 +1,332 @@
 const { expect } = require("chai")
-const {
-  path,
-  is,
-  assoc,
-  compose,
-  pickAll,
-  pluck,
-  equals,
-  init,
-  concat,
-  without,
-  addIndex,
-  range,
-  splitAt,
-  tail,
-  indexOf,
-  last,
-  splitWhen,
-  lt,
-  objOf,
-  flatten,
-  zip,
-  median,
-  prop,
-  isNil,
-  map,
-} = require("ramda")
+const DB = require("weavedb-node-client")
+const crypto = require("crypto")
+const EthCrypto = require("eth-crypto")
+const dbOwnerAuth = require("../.weavedb/accounts/evm/owner.json")
+const nodeAdminAuth = require("../.weavedb/accounts/evm/admin.json")
 
-describe("WeaveDB", () => {
-  it("splits node values in half", async () => {
+describe("rollup node", function () {
+  this.timeout(0)
+  const RPC_NODE = "localhost:9090"
+  const DATABASE_KEY = "testdb"
+  const COLLECTION_NAME = "posts"
+  const CONTRACT_TX_ID = DATABASE_KEY
+
+  before(async () => {
+    this.bail(true)
+  })
+
+  after(async () => {
+    process.exit()
+  })
+
+  const wait = (ms) => {
+    console.log("waiting for...", String(ms), "ms")
+    return new Promise((res) => setTimeout(() => res(), ms))
+  }
+
+  it("should add new db offchain", async () => {
     try {
-      const TX_COUNT = 300000
-      const _split = async (node, stats) => {
-        let nodes = splitAt(Math.ceil(node.vals.length / 2))(node.vals)
-        node.vals = node.leaf ? nodes[0] : init(nodes[0])
-        let new_node = {
-          leaf: node.leaf,
-          // id: await this.id(stats),
-          vals: nodes[1],
-          prev: node.id,
-          next: node.next ?? null,
-        }
-        if (!isNil(node.next)) {
-          let next = await this.get(node.next, stats)
-          next.prev = new_node.id
-          await this.putNode(next, stats)
-        }
-      }
+      const db = new DB({
+        rpc: RPC_NODE,
+        contractTxId: CONTRACT_TX_ID,
+      })
+      await wait(2000)
+      const stats = await db.node({ op: "stats" })
+      expect(stats).to.eql({ dbs: [] })
+      const tx = await db.admin(
+        {
+          op: "add_db",
+          key: DATABASE_KEY,
+          db: {
+            app: "http://localhost:3000",
+            name: "Jots",
+            rollup: false,
+            owner: dbOwnerAuth.address.toLowerCase(),
+          },
+        },
+        nodeAdminAuth
+      )
+      expect(tx.success).to.eql(true)
+      await wait(2000)
+    } catch (e) {
+      console.error(e)
+      expect(e).to.eql(null)
+    }
+  })
+
+  it("should set rules", async () => {
+    try {
+      const db = new DB({
+        rpc: RPC_NODE,
+        contractTxId: CONTRACT_TX_ID,
+      })
+
+      const txSetRules = await db.setRules(
+        [["allow()"]],
+        COLLECTION_NAME,
+        "write",
+        dbOwnerAuth
+      )
+      expect(txSetRules.success).to.eql(true)
+      // console.log("getRules", await db.getRules(COLLECTION_NAME))
+    } catch (e) {
+      console.error(e)
+      expect(e).to.eql(null)
+    }
+  })
+
+  it("should add new docs in parallel", async () => {
+    try {
+      const db = new DB({
+        rpc: RPC_NODE,
+        contractTxId: CONTRACT_TX_ID,
+      })
+
+      const TX_COUNT = 100
 
       const addPost1 = async () => {
-        const node = {
-          id: 1,
-          vals: [1, 2, 3, 4],
-          leaf: true,
-        }
-        const stats = {}
+        const randomBytes = crypto.randomBytes(16).toString("hex")
+        const userAuth = EthCrypto.createIdentity()
         for (let i = 0; i < TX_COUNT; i++) {
-          await _split(node, stats)
+          const txAddPost = await db.add(
+            { name: randomBytes },
+            COLLECTION_NAME,
+            userAuth
+          )
         }
+        return "addPost1"
       }
       const addPost2 = async () => {
-        const node = {
-          id: 1,
-          vals: [1, 2, 3, 4],
-          leaf: true,
-        }
-        const stats = {}
+        const randomBytes = crypto.randomBytes(16).toString("hex")
+        const userAuth = EthCrypto.createIdentity()
         for (let i = 0; i < TX_COUNT; i++) {
-          await _split(node, stats)
+          const txAddPost = await db.add(
+            { name: randomBytes },
+            COLLECTION_NAME,
+            userAuth
+          )
         }
+        return "addPost2"
       }
       const addPost3 = async () => {
-        const node = {
-          id: 1,
-          vals: [1, 2, 3, 4],
-          leaf: true,
-        }
-        const stats = {}
+        const randomBytes = crypto.randomBytes(16).toString("hex")
+        const userAuth = EthCrypto.createIdentity()
         for (let i = 0; i < TX_COUNT; i++) {
-          await _split(node, stats)
+          const txAddPost = await db.add(
+            { name: randomBytes },
+            COLLECTION_NAME,
+            userAuth
+          )
         }
+        return "addPost3"
       }
       const addPost4 = async () => {
-        const node = {
-          id: 1,
-          vals: [1, 2, 3, 4],
-          leaf: true,
-        }
-        const stats = {}
+        const randomBytes = crypto.randomBytes(16).toString("hex")
+        const userAuth = EthCrypto.createIdentity()
         for (let i = 0; i < TX_COUNT; i++) {
-          await _split(node, stats)
+          const txAddPost = await db.add(
+            { name: randomBytes },
+            COLLECTION_NAME,
+            userAuth
+          )
         }
+        return "addPost4"
       }
       const addPost5 = async () => {
-        const node = {
-          id: 1,
-          vals: [1, 2, 3, 4],
-          leaf: true,
-        }
-        const stats = {}
+        const randomBytes = crypto.randomBytes(16).toString("hex")
+        const userAuth = EthCrypto.createIdentity()
         for (let i = 0; i < TX_COUNT; i++) {
-          await _split(node, stats)
+          const txAddPost = await db.add(
+            { name: randomBytes },
+            COLLECTION_NAME,
+            userAuth
+          )
         }
+        return "addPost5"
       }
       const addPost6 = async () => {
-        const node = {
-          id: 1,
-          vals: [1, 2, 3, 4],
-          leaf: true,
-        }
-        const stats = {}
+        const randomBytes = crypto.randomBytes(16).toString("hex")
+        const userAuth = EthCrypto.createIdentity()
         for (let i = 0; i < TX_COUNT; i++) {
-          await _split(node, stats)
+          const txAddPost = await db.add(
+            { name: randomBytes },
+            COLLECTION_NAME,
+            userAuth
+          )
         }
+        return "addPost6"
       }
       const addPost7 = async () => {
-        const node = {
-          id: 1,
-          vals: [1, 2, 3, 4],
-          leaf: true,
-        }
-        const stats = {}
+        const randomBytes = crypto.randomBytes(16).toString("hex")
+        const userAuth = EthCrypto.createIdentity()
         for (let i = 0; i < TX_COUNT; i++) {
-          await _split(node, stats)
+          const txAddPost = await db.add(
+            { name: randomBytes },
+            COLLECTION_NAME,
+            userAuth
+          )
         }
+        return "addPost7"
       }
       const addPost8 = async () => {
-        const node = {
-          id: 1,
-          vals: [1, 2, 3, 4],
-          leaf: true,
-        }
-        const stats = {}
+        const randomBytes = crypto.randomBytes(16).toString("hex")
+        const userAuth = EthCrypto.createIdentity()
         for (let i = 0; i < TX_COUNT; i++) {
-          await _split(node, stats)
+          const txAddPost = await db.add(
+            { name: randomBytes },
+            COLLECTION_NAME,
+            userAuth
+          )
         }
+        return "addPost8"
       }
       const addPost9 = async () => {
-        const node = {
-          id: 1,
-          vals: [1, 2, 3, 4],
-          leaf: true,
-        }
-        const stats = {}
+        const randomBytes = crypto.randomBytes(16).toString("hex")
+        const userAuth = EthCrypto.createIdentity()
         for (let i = 0; i < TX_COUNT; i++) {
-          await _split(node, stats)
+          const txAddPost = await db.add(
+            { name: randomBytes },
+            COLLECTION_NAME,
+            userAuth
+          )
         }
+        return "addPost9"
       }
       const addPost10 = async () => {
-        const node = {
-          id: 1,
-          vals: [1, 2, 3, 4],
-          leaf: true,
-        }
-        const stats = {}
+        const randomBytes = crypto.randomBytes(16).toString("hex")
+        const userAuth = EthCrypto.createIdentity()
         for (let i = 0; i < TX_COUNT; i++) {
-          await _split(node, stats)
+          const txAddPost = await db.add(
+            { name: randomBytes },
+            COLLECTION_NAME,
+            userAuth
+          )
         }
+        return "addPost10"
       }
       const addPost11 = async () => {
-        const node = {
-          id: 1,
-          vals: [1, 2, 3, 4],
-          leaf: true,
-        }
-        const stats = {}
+        const randomBytes = crypto.randomBytes(16).toString("hex")
+        const userAuth = EthCrypto.createIdentity()
         for (let i = 0; i < TX_COUNT; i++) {
-          await _split(node, stats)
+          const txAddPost = await db.add(
+            { name: randomBytes },
+            COLLECTION_NAME,
+            userAuth
+          )
         }
+        return "addPost11"
       }
       const addPost12 = async () => {
-        const node = {
-          id: 1,
-          vals: [1, 2, 3, 4],
-          leaf: true,
-        }
-        const stats = {}
+        const randomBytes = crypto.randomBytes(16).toString("hex")
+        const userAuth = EthCrypto.createIdentity()
         for (let i = 0; i < TX_COUNT; i++) {
-          await _split(node, stats)
+          const txAddPost = await db.add(
+            { name: randomBytes },
+            COLLECTION_NAME,
+            userAuth
+          )
         }
+        return "addPost12"
       }
       const addPost13 = async () => {
-        const node = {
-          id: 1,
-          vals: [1, 2, 3, 4],
-          leaf: true,
-        }
-        const stats = {}
+        const randomBytes = crypto.randomBytes(16).toString("hex")
+        const userAuth = EthCrypto.createIdentity()
         for (let i = 0; i < TX_COUNT; i++) {
-          await _split(node, stats)
+          const txAddPost = await db.add(
+            { name: randomBytes },
+            COLLECTION_NAME,
+            userAuth
+          )
         }
+        return "addPost13"
       }
       const addPost14 = async () => {
-        const node = {
-          id: 1,
-          vals: [1, 2, 3, 4],
-          leaf: true,
-        }
-        const stats = {}
+        const randomBytes = crypto.randomBytes(16).toString("hex")
+        const userAuth = EthCrypto.createIdentity()
         for (let i = 0; i < TX_COUNT; i++) {
-          await _split(node, stats)
+          const txAddPost = await db.add(
+            { name: randomBytes },
+            COLLECTION_NAME,
+            userAuth
+          )
         }
+        return "addPost14"
       }
       const addPost15 = async () => {
-        const node = {
-          id: 1,
-          vals: [1, 2, 3, 4],
-          leaf: true,
-        }
-        const stats = {}
+        const randomBytes = crypto.randomBytes(16).toString("hex")
+        const userAuth = EthCrypto.createIdentity()
         for (let i = 0; i < TX_COUNT; i++) {
-          await _split(node, stats)
+          const txAddPost = await db.add(
+            { name: randomBytes },
+            COLLECTION_NAME,
+            userAuth
+          )
         }
+        return "addPost15"
       }
       const addPost16 = async () => {
-        const node = {
-          id: 1,
-          vals: [1, 2, 3, 4],
-          leaf: true,
-        }
-        const stats = {}
+        const randomBytes = crypto.randomBytes(16).toString("hex")
+        const userAuth = EthCrypto.createIdentity()
         for (let i = 0; i < TX_COUNT; i++) {
-          await _split(node, stats)
+          const txAddPost = await db.add(
+            { name: randomBytes },
+            COLLECTION_NAME,
+            userAuth
+          )
         }
+        return "addPost16"
       }
       const addPost17 = async () => {
-        const node = {
-          id: 1,
-          vals: [1, 2, 3, 4],
-          leaf: true,
-        }
-        const stats = {}
+        const randomBytes = crypto.randomBytes(16).toString("hex")
+        const userAuth = EthCrypto.createIdentity()
         for (let i = 0; i < TX_COUNT; i++) {
-          await _split(node, stats)
+          const txAddPost = await db.add(
+            { name: randomBytes },
+            COLLECTION_NAME,
+            userAuth
+          )
         }
+        return "addPost17"
       }
       const addPost18 = async () => {
-        const node = {
-          id: 1,
-          vals: [1, 2, 3, 4],
-          leaf: true,
-        }
-        const stats = {}
+        const randomBytes = crypto.randomBytes(16).toString("hex")
+        const userAuth = EthCrypto.createIdentity()
         for (let i = 0; i < TX_COUNT; i++) {
-          await _split(node, stats)
+          const txAddPost = await db.add(
+            { name: randomBytes },
+            COLLECTION_NAME,
+            userAuth
+          )
         }
+        return "addPost18"
       }
       const addPost19 = async () => {
-        const node = {
-          id: 1,
-          vals: [1, 2, 3, 4],
-          leaf: true,
-        }
-        const stats = {}
+        const randomBytes = crypto.randomBytes(16).toString("hex")
+        const userAuth = EthCrypto.createIdentity()
         for (let i = 0; i < TX_COUNT; i++) {
-          await _split(node, stats)
+          const txAddPost = await db.add(
+            { name: randomBytes },
+            COLLECTION_NAME,
+            userAuth
+          )
         }
+        return "addPost19"
       }
       const addPost20 = async () => {
-        const node = {
-          id: 1,
-          vals: [1, 2, 3, 4],
-          leaf: true,
-        }
-        const stats = {}
+        const randomBytes = crypto.randomBytes(16).toString("hex")
+        const userAuth = EthCrypto.createIdentity()
         for (let i = 0; i < TX_COUNT; i++) {
-          await _split(node, stats)
+          const txAddPost = await db.add(
+            { name: randomBytes },
+            COLLECTION_NAME,
+            userAuth
+          )
         }
+        return "addPost20"
       }
 
-      const result = await Promise.allSettled([
+      const results = await Promise.allSettled([
         addPost1(),
         addPost2(),
         addPost3(),
@@ -291,7 +348,29 @@ describe("WeaveDB", () => {
         addPost19(),
         addPost20(),
       ])
-      console.log("result", result)
+      // console.log(results)
+    } catch (e) {
+      console.error(e)
+      expect(e).to.eql(null)
+    }
+  })
+
+  it("should not have null data in WAL", async () => {
+    try {
+      const db = new DB({
+        rpc: RPC_NODE,
+        contractTxId: `${CONTRACT_TX_ID}#log`,
+      })
+      const page1 = await db.cget("txs", 1000)
+      const filteredItemsPage1 = page1.filter((item) => {
+        if (item.data && typeof item.data === "object") {
+          return Object.keys(item.data).length === 0
+        }
+        return true
+      })
+      console.log("items that have null data in WAL : ", filteredItemsPage1)
+      if (filteredItemsPage1.length > 0)
+        throw "data is null on some items fetched from WAL"
     } catch (e) {
       console.error(e)
       expect(e).to.eql(null)
