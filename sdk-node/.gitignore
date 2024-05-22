@@ -1,3 +1,4 @@
 .wallets
 node_modules
 cache
+.env
