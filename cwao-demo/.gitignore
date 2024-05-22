@@ -1,0 +1,5 @@
+.weavedb/
+.wallets
+node_modules
+cache
+test/.env
