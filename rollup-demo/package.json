@@ -22,6 +22,6 @@
     "warp-contracts": "^1.4.45",
     "weavedb-node-client": "^0.40.0",
     "weavedb-offchain": "^0.40.3",
-    "weavedb-sdk-node": "^0.40.2"
+    "weavedb-sdk-node": "^0.42.2"
   }
 }
