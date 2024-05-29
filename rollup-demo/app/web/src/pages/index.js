@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import SDK from "weavedb-client"
 
 export default function Home() {
@@ -46,9 +46,9 @@ export default function Home() {
   const [db, setDb] = useState()
   const [dbName, setDbName] = useState("")
   const [ownerWalletAddress, setOwnerWalletAddress] = useState("")
-  const ADMIN_PRIVATE_KEY = "" // Replace 'ADMIN_PRIVATE_KEY' with the actual admin private key
+  const [adminKey, setAdminKey] = useState("")
 
-  const deployDatabase = async () => {
+  const deployOffchainDb = async () => {
     try {
       await db.admin(
         {
@@ -64,26 +64,26 @@ export default function Home() {
           },
         },
         {
-          // privateKey: ADMIN_PRIVATE_KEY,
-          nonce: 1,
+          privateKey: adminKey,
+          // nonce: 1,
         }
       )
       console.log(`DB [${dbName}] added!`)
     } catch (e) {
-      console.log(e.message)
+      console.log(e)
     }
   }
 
-  const deployWarp = async () => {
+  const deployWarpDb = async () => {
     try {
       const { contractTxId, srcTxId } = await db.admin(
         {
           op: "deploy_contract",
           key: dbName,
+        },
+        {
+          privateKey: adminKey,
         }
-        // {
-        //   privateKey: ADMIN_PRIVATE_KEY,
-        // }
       )
       if (contractTxId) {
         console.log("DB successfully deployed!")
@@ -92,7 +92,20 @@ export default function Home() {
         console.log("something went wrong!")
       }
     } catch (e) {
-      console.log(e.message)
+      console.log(e)
+    }
+  }
+
+  const deleteDatabase = async () => {
+    try {
+      const tx = await db.admin(
+        { op: "remove_db", key: dbName },
+        { privateKey: adminPrivKey }
+      )
+      console.log("tx", tx)
+      console.log(`DB [${dbName}] removed!`)
+    } catch (e) {
+      console.log(e)
     }
   }
 
@@ -106,8 +119,6 @@ export default function Home() {
     const stats = await _db.node({ op: "stats" })
     console.log("stats", stats)
   }
-
-  useEffect(() => {}, [])
 
   return (
     <>
@@ -123,7 +134,7 @@ export default function Home() {
       <label>Database Owner Wallet Address:</label>
       <input
         type="text"
-        size="28"
+        size="58"
         required
         onChange={(e) => setOwnerWalletAddress(e.target.value)}
       />
@@ -136,20 +147,32 @@ export default function Home() {
         id="url"
         placeholder="http://localhost:8080"
         pattern="http://.*"
-        size="28"
+        size="78"
         required
         defaultValue={rpcUrl}
         onChange={(e) => setRpcUrl(e.target.value)}
       />
       <br />
       <br />
+      <label>Rollup Node Admin Private Key:</label>
+      <input
+        type="text"
+        size="78"
+        required
+        onChange={(e) => setAdminKey(e.target.value)}
+      />
+      <br />
+      <br />
       <button onClick={connect}>Connect</button>
       <br />
       <br />
-      <button onClick={deployDatabase}>Deploy Database</button>
+      <button onClick={deployOffchainDb}>Deploy Database</button>
       <br />
       <br />
-      <button onClick={deployWarp}>Deploy to Warp</button>
+      <button onClick={deployWarpDb}>Deploy to Warp</button>
+      <br />
+      <br />
+      <button onClick={deleteDatabase}>Delete Database</button>
     </>
   )
 }
