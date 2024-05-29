@@ -69,6 +69,8 @@ export default function Home() {
         }
       )
       console.log(`DB [${dbName}] added!`)
+      const stats = await db.node({ op: "stats" })
+      console.log("stats", stats)
     } catch (e) {
       console.log(e)
     }
@@ -100,10 +102,12 @@ export default function Home() {
     try {
       const tx = await db.admin(
         { op: "remove_db", key: dbName },
-        { privateKey: adminPrivKey }
+        { privateKey: adminKey }
       )
       console.log("tx", tx)
       console.log(`DB [${dbName}] removed!`)
+      const stats = await db.node({ op: "stats" })
+      console.log("stats", stats)
     } catch (e) {
       console.log(e)
     }
@@ -172,7 +176,7 @@ export default function Home() {
       <button onClick={deployWarpDb}>Deploy to Warp</button>
       <br />
       <br />
-      <button onClick={deleteDatabase}>Delete Database</button>
+      <button onClick={deleteDatabase}>Delete DB from Node</button>
     </>
   )
 }
