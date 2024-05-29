@@ -44,27 +44,26 @@ const main = async () => {
         key: name,
         db: { ...config.db, owner: accounts.evm[owner].address.toLowerCase() },
       },
-      { privateKey }
+      { privateKey, nonce: 1 }
     )
     console.log(`DB [${name}] added!`)
-
-    if (config.db.rollup) {
-      const tx = await db.admin(
-        {
-          op: "deploy_contract",
-          key: name,
-        },
-        { privateKey }
-      )
-      if (!isNil(tx.contractTxId)) {
-        console.log("DB successfully deployed!")
-        console.log(tx)
-      } else {
-        console.log("something went wrong!")
-      }
-    }
   } catch (e) {
-    console.log(e)
+    console.log(e.message)
+  }
+  if (config.db.rollup) {
+    const tx = await db.admin(
+      {
+        op: "deploy_contract",
+        key: name,
+      },
+      { privateKey, nonce: 1 }
+    )
+    if (!isNil(tx.contractTxId)) {
+      console.log("DB successfully deployed!")
+      console.log(tx)
+    } else {
+      console.log("something went wrong!")
+    }
   }
   process.exit()
 }
