@@ -65,7 +65,7 @@ export default function Home() {
         },
         {
           privateKey: adminKey,
-          // nonce: 1,
+          nonce: 1,
         }
       )
       console.log(`DB [${dbName}] added!`)
@@ -82,9 +82,11 @@ export default function Home() {
         {
           op: "deploy_contract",
           key: dbName,
+          type: "warp",
         },
         {
           privateKey: adminKey,
+          nonce: 1,
         }
       )
       if (contractTxId) {
