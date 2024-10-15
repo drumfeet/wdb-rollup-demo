@@ -1,15 +1,35 @@
 import SDK from "weavedb-client"
 
 export default function Home() {
+  const COLLECTION_NAME = "posts"
+  const CONTRACT_TX_ID = "fFVsNa6C1YUPD5SScgXWRbuYuAuqFPMt3JvAKLn_D58"
+  const RPC_URL = "http://localhost:8080"
+
   const start = async () => {
     try {
       const db = new SDK({
-        rpc: "https://30a8a715-78fc-41d4-bfa3-4f4152812484.raas.weavedb-node.xyz:443",
-        contractTxId: "br_Wm7k3ix1c85r16tUQNd0yNaiSrboigY5n4thU6J0",
+        rpc: RPC_URL,
+        contractTxId: CONTRACT_TX_ID,
       })
 
-      const tx = await db.setRules([["allow()"]], "collection_name", "write")
+      const tx = await db.setRules([["allow()"]], COLLECTION_NAME, "write")
       console.log("tx", tx)
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  const addDoc = async () => {
+    try {
+      const db = new SDK({
+        rpc: RPC_URL,
+        contractTxId: CONTRACT_TX_ID,
+      })
+      const txAdd = await db.add({ name: "Bob" }, COLLECTION_NAME, {
+        privateKey:
+          "YOUR_PRIVATEKEY_HERE",
+      })
+      console.log("txAdd", txAdd)
     } catch (e) {
       console.error(e)
     }
@@ -18,6 +38,9 @@ export default function Home() {
   return (
     <>
       <button onClick={start}>Start</button>
+      <br />
+      <br />
+      <button onClick={addDoc}>Add Doc</button>
     </>
   )
 }

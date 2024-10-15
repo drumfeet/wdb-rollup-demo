@@ -1,20 +1,21 @@
 const WeaveDB = require("weavedb-node-client")
-const accounts = require("./lib/accounts")
-
-const CONTRACT_TX_ID = "ahmadtest"
-const COLLECTION_NAME = "people"
 
 const db = new WeaveDB({
-  rpc: "13.250.6.80:8080",
-  contractTxId: CONTRACT_TX_ID, // Replace 'CONTRACT_TX_ID' with an existing deployed database contract on the rollup node
+  // rpc: "0d93e96f-8fb5-4cf1-91fa-9fa5d32ff2e6.raas.weavedb-node.xyz:443",
+  rpc: "localhost:8080",
+  // contractTxId: "IteK7XLLrqsWkRdT73WCmH4_G_C7ybq6962j7ovbyHk",
+  contractTxId: "NinDlDlXvdHfJM2ZCaqsIJoMJy6JQ6iSZZkThRxSrM4"
 })
 
 const main = async () => {
-  const adminAuth = accounts.evm.admin.privateKey
-  const tx = await db.setRules([["deny()"]], COLLECTION_NAME, "write", {
-    privateKey: adminAuth,
-  })
-  console.log("tx", tx)
+  try {
+    const tx = await db.setRules([["allow()"]], "posts", "write", {
+      privateKey:
+        "YOUR_PRIVATEKEY_HERE",
+    })
+    console.log("tx", tx)
+  } catch (e) {
+    console.log(e)
+  }
 }
-
 main()
